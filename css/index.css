@@ -47,11 +47,44 @@ header div{
     background-position-y: 50%;
     background-clip: border-box;
 }
-.boxDim{
+.parent div{
     position:relative;
     background-color: var(--primary-color);
-    width: 40vw;
-    z-index: 3;
-    height: 60vh;
+    z-index: 3; 
+}
+
+.parent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 8px;
+    height: 100vh;
+    width: 80vw;
+    margin-left: 10%;
+}
     
+.div1 {
+    grid-row: span 3 / span 3;
+}
+
+.div2 {
+    grid-row: span 2 / span 2;
+}
+
+.div3 {
+    grid-row: span 3 / span 3;
+    grid-column-start: 2;
+    grid-row-start: 3;
+}
+
+.div6 {
+    grid-row: span 2 / span 2;
+    grid-row-start: 4;
+}
+
+@media (max-height:20px) {
+    header{
+    flex-direction: column;
+    overflow: hidden;
+    }
 }
