@@ -32,6 +32,8 @@ header button{
     text-transform:uppercase;
     border: solid var(--primary-color) 2px;
     z-index: 3;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
 }
 header div{
     position: absolute;
@@ -51,6 +53,8 @@ header div{
     position:relative;
     background-color: var(--primary-color);
     z-index: 3; 
+    border-radius: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .parent {
@@ -82,9 +86,38 @@ header div{
     grid-row-start: 4;
 }
 
-@media (max-height:20px) {
-    header{
-    flex-direction: column;
-    overflow: hidden;
+@media (max-height:900px) {
+    header {
+        flex-direction: column;
+        overflow: hidden;
     }
+
+    .parent {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 1fr);
+        gap: 8px;
+        height: 200vh;
+    }
+
+    .div1 {
+        grid-row: 1;
+        grid-column: 1;
+    }
+
+    .div2 {
+        grid-row: 2;
+        grid-column: 1;
+    }
+
+    .div3 {
+        grid-row: 3;
+        grid-column: 1;
+    }
+
+    .div6 {
+        grid-row: 4;
+        grid-column: 1;
+    }
+
 }
