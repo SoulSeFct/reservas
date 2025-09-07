@@ -133,7 +133,7 @@ nav a:hover {
   background: #c0392b;
   color: white;
   text-align: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
 }
 
 .reservas h3 {
@@ -142,6 +142,8 @@ nav a:hover {
 }
 
 .reservas a {
+  margin-top: 10px;
+  display: inline-block;
   background: white;
   color: #c0392b;
   padding: 12px 25px;
@@ -152,4 +154,5 @@ nav a:hover {
 
 .reservas a:hover {
   background: #f4f4f4;
+  
 }
