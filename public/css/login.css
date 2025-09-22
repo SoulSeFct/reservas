@@ -37,6 +37,7 @@ form{
     height: 76vh;
     width: 60vw;
     background-color: hsl(0, 0%, 96%);
+    font-family: Arial, sans-serif;
     top: 50%;
     left: 50%;
     transform: translate(-52%,-50%);
@@ -73,4 +74,51 @@ form{
 
 .div6 {
     grid-column: span 2 / span 2;
+}
+
+.div2, .div3, .div4, .div5, .div6{
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.div2 input, .div3 input, .div4 input, .div5 input{
+    height: 50% !important;
+    padding-left: 2%;
+    border-radius: 25px;
+    background-blend-mode: overlay;
+    font-size: 16px;
+    border: 1px solid rgba(0,0,0,0.12);
+    transition: 300ms;
+    background-color: white;
+    outline: none;
+}
+input:focus{
+  box-shadow: 0 0 0 4px rgba(192,57,43,0.12); /* tono ligero del botón rojo */
+  border-color: rgba(192,57,43,0.9);
+}
+.btn {
+  background: #c0392b;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#back{
+    height: 20px;
+    width: auto;
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    z-index: 5;
+    transition: 300ms;
+    cursor: pointer;
+
+}
+#back:hover{
+      filter: invert(19%) sepia(89%) saturate(6747%) hue-rotate(345deg) brightness(92%) contrast(92%);
+
 }

@@ -1,15 +1,117 @@
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <title>Baúl de Kiwi</title>
-    <link rel="stylesheet" href="../css/cart.css"></link>
-    <link rel="icon" href="..src/icon.png">
+    <link rel="stylesheet" href="../css/login.css"></link>
+    <link rel="icon" href="../src/icon.png">
 </head>
 <body>
     <header>
         <div></div>
     </header>
+    <form id="form1">
+        <img id="back" src="../src/back.svg" onclick="window.location.href='/'">
+        <div class="div1">
+            <h2>Definamos tu reserva</h2>
+        </div>
+        <div class="div2">
+            <label>Fecha de tu reserva</label>
+            <input type="date" name="fecha"id="fecha"min="2025-09-21" max="2025-12-31"  required>
+        </div>
+        <div class="div3">
+            <label>Hora de tu reserva</label>
+            <input type="time" name="tiempo"id="hora" min="09:00" max="20:00" step="1800" required>
+            <small>Horario de 9am a 8pm, reservas con intervalos de 30min</small>
+        </div>
+        <div class="div4">
+            <label>Nombre Completo</label>
+            <input type="text" name="nombre" placeholder="Nombre y Apellidos" required>
+        </div>
+        <div class="div5">
+            <label>Tu correo</label>
+            <input type="email" id="correo" name="correo" placeholder="Correo" required>
+
+        </div>
+        <div class="div6">
+            <button type="submit" class="btn" id="btnContinuar">Continuar</button>
+        </div>
+    </form>
 </body>
+<script>
+    //Codigo para el tiempo
+    const toSec = t => {
+    if (!t) return 0;
+    const [h,m] = t.split(':').map(Number);
+    return h*3600 + m*60;
+    };
+    const toHHMM = s => {
+    s = Math.max(0, Math.min(24*3600-1, Math.round(s)));
+    const h = String(Math.floor(s/3600)).padStart(2,'0');
+    const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+    return `${h}:${m}`;
+    };
+
+    const snap = input => {
+    const v = input.value;
+    if (!v) return;
+    const min = input.min ? toSec(input.min) : 0;
+    const max = input.max ? toSec(input.max) : 24*3600-1;
+    const step = input.step ? Number(input.step) : 60;
+    let s = toSec(v);
+    s = Math.round(s/step)*step;
+    if (s < min) s = min;
+    if (s > max) s = max;
+    const newVal = toHHMM(s);
+    if (newVal !== v) { input.value = newVal; input.dispatchEvent(new Event('change',{bubbles:true})); }
+    };
+
+    const input = document.getElementById('hora');
+    input.addEventListener('blur', () => snap(input));
+    input.addEventListener('change', () => snap(input));
+    if (input.form) input.form.addEventListener('submit', () => snap(input));
+    const fechaInput = document.getElementById("fecha");
+    const hoy = new Date();
+    const manana = new Date();
+    manana.setDate(hoy.getDate() + 1);
+    const cuatroMeses = new Date();
+    cuatroMeses.setMonth(hoy.getMonth() + 4);
+    const formatear = d => d.toISOString().split("T")[0];
+    fechaInput.min = formatear(manana);
+    fechaInput.max = formatear(cuatroMeses);
+    fechaInput.addEventListener('keydown', e => e.preventDefault());
+    fechaInput.addEventListener('paste', e => e.preventDefault());
+
+    //Codigo para enviar los datos a un json temporal
+
+    const form = document.getElementById("form1");
+    const btn = document.getElementById("btnContinuar");
+
+   form.addEventListener("submit", async e => {
+    e.preventDefault(); // evita que el formulario recargue la página
+
+    snap(input); // ajusta la hora antes de enviar
+
+    const formData = new FormData(form);
+    const datos = Object.fromEntries(formData);
+
+    try {
+        const res = await fetch("/api/reservas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        });
+
+        const respuesta = await res.json();
+        console.log("Respuesta del servidor:", respuesta);
+        alert("Reserva enviada correctamente");
+        form.reset();
+    } catch (err) {
+        console.error(err);
+        alert("Error al enviar la reserva");
+    }
+});
+</script>
 </html>
