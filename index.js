@@ -20,9 +20,9 @@ app.get('/', async (req, res) => {
 
 
 
-app.get('/login', async (req, res) => {
+app.get('/tables', async (req, res) => {
     try {
-      const content = await fs.readFile(('./public/app/login.html'), 'utf-8');
+      const content = await fs.readFile(('./public/app/tables.html'), 'utf-8');
       res.send(content);
     } catch (err) {
       res.status(500).send('Error en Introduccion.');
@@ -38,12 +38,22 @@ app.get('/booking', async (req, res) => {
     }
 });
 
-app.post("/api/reservas", (req, res) => {
-    const datos = req.body;
-    console.log("Datos recibidos:", datos);
+let reservas = [];
 
-    // Aquí podrías guardarlos en un JSON temporal, base de datos, etc.
-    res.json({ status: "ok", recibido: datos });
+app.post("/api/reservas", (req, res) => {
+    reservas = [];
+    reservas.push(req.body);
+    console.log("Datos recibidos:", req.body);
+    res.json({ status: 1 });
+});
+
+app.post("/api/reservas/mesa", (req, res) => {
+    const { mesa } = req.body;
+    if (reservas.length === 0) return res.json({ status: 0, msg: "No hay reserva previa" });
+
+    reservas[reservas.length - 1].mesa = mesa;
+    console.log("Reserva actualizada con mesa:", reservas[reservas.length - 1]);
+    res.json({ status: 1 });
 });
 
 app.listen(port, () => {

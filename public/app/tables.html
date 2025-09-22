@@ -1,0 +1,86 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>Baúl de Kiwi</title>
+    <link rel="stylesheet" href="../css/cart.css"></link>
+    <link rel="icon" href="../src/icon.png">
+</head>
+<body>
+    <header>
+        <div></div>
+    </header>
+    <form id="form1">
+        <img id="back" src="../src/back.svg" onclick="window.location.href='/'">
+        <div class="div1">
+            <h2>Definamos tu mesa</h2>
+        </div>
+        <div class="div2">
+            <div id="map" >
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="200 0 2000 1100" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" export-id="94d07cc500504c73bd4a864d47f61806" cached="false">
+                    <g xmlns="http://www.w3.org/2000/svg">
+  <rect class="mesa" id="Mesa 1" stroke-width="6" id="svg_18" height="294.99619" width="153.33136" y="294.98561" x="466.64535" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 2" stroke-width="6" id="svg_19" height="294.99619" width="153.33136" y="296.65226" x="749.97503" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 3" stroke-width="6" id="svg_20" height="291.6629" width="149.99806" y="298.31891" x="1031.63806" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 4" stroke-width="6" id="svg_21" height="179.99768" width="549.9929" y="334.9851" x="1423.29968" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 5" stroke-width="6" id="svg_22" height="176.66439" width="551.65955" y="619.98142" x="1423.29968" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 6" stroke-width="6" id="svg_23" height="179.99768" width="176.66439" y="904.97774" x="536.64445" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 7" stroke-width="6" id="svg_24" height="183.33097" width="183.33097" y="908.31104" x="819.97413" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 8" stroke-width="6" id="svg_25" height="176.66439" width="181.66432" y="916.64426" x="1088.304" stroke="#000000" fill="none"/>
+  <rect class="mesa" id="Mesa 9" stroke-width="6" id="svg_26" height="179.99768" width="554.99284" y="914.97762" x="1429.96626" stroke="#000000" fill="none"/>
+ </g>
+                </svg>
+            </div>
+
+        </div>
+        <div class="div6">
+            <button type="submit" class="btn" id="btnContinuar">Continuar</button>
+        </div>
+    </form>
+</body>
+<script>
+let mesaelegida = "";
+const mesas = document.querySelectorAll('.mesa');
+
+mesas.forEach(mesa => {
+    mesa.addEventListener('click', () => {
+        mesas.forEach(m => m.classList.remove('active'));
+        mesa.classList.add('active');
+        mesaelegida = mesa.id;
+    });
+});
+
+const form = document.getElementById("form1");
+
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (mesaelegida === "") {
+        alert("Elige una mesa");
+        return;
+    }
+
+    // Enviar solo la mesa, el resto de datos ya está en el servidor
+    try {
+        const res = await fetch("/api/reservas/mesa", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mesa: mesaelegida })
+        });
+
+        const respuesta = await res.json();
+        if (respuesta.status === 1) {
+            alert("Mesa seleccionada correctamente");
+            window.location.href = "/";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error al seleccionar la mesa");
+    }
+});
+</script>
+
+</html>

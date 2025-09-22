@@ -105,9 +105,11 @@
         });
 
         const respuesta = await res.json();
-        console.log("Respuesta del servidor:", respuesta);
-        alert("Reserva enviada correctamente");
-        form.reset();
+        if(respuesta.status === 1){
+            form.reset();
+            window.location.href="/tables"
+        }
+        
     } catch (err) {
         console.error(err);
         alert("Error al enviar la reserva");
