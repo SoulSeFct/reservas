@@ -85,6 +85,7 @@ form{
 .div2 input, .div3 input, .div4 input, .div5 input{
     height: 50% !important;
     padding-left: 2%;
+    padding-right: 2%;
     border-radius: 25px;
     background-blend-mode: overlay;
     font-size: 16px;

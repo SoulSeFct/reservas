@@ -53,10 +53,11 @@ mesas.forEach(mesa => {
 });
 
 const form = document.getElementById("form1");
+const boton = document.getElementById("btnContinuar")
 
 form.addEventListener("submit", async e => {
     e.preventDefault();
-
+    boton.disabled = true;
     if (mesaelegida === "") {
         alert("Elige una mesa");
         return;
@@ -64,17 +65,19 @@ form.addEventListener("submit", async e => {
 
     // Enviar solo la mesa, el resto de datos ya está en el servidor
     try {
-        const res = await fetch("/api/reservas/mesa", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mesa: mesaelegida })
-        });
+    const res = await fetch("/api/reservas/mesa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mesa: mesaelegida })
+    });
 
-        const respuesta = await res.json();
-        if (respuesta.status === 1) {
-            alert("Mesa seleccionada correctamente");
-            window.location.href = "/";
-        }
+    const respuesta = await res.json();
+    if (respuesta.status === 1) {
+        alert("Mesa seleccionada correctamente");
+        window.location.href = "/";
+    } else {
+        alert("Error al seleccionar la mesa: " + respuesta.error);
+    }
 
     } catch (err) {
         console.error(err);

@@ -1,6 +1,9 @@
-const express = require('express');
-const fs = require('fs').promises;  
-const path = require('path');
+import express from "express";
+import { promises as fs } from "fs";
+import path from "path";
+import dotenv from 'dotenv';
+dotenv.config();
+import { addReservation, getReservations } from "./firebase/firebase.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -47,13 +50,20 @@ app.post("/api/reservas", (req, res) => {
     res.json({ status: 1 });
 });
 
-app.post("/api/reservas/mesa", (req, res) => {
+app.post("/api/reservas/mesa", async (req, res) => {
     const { mesa } = req.body;
     if (reservas.length === 0) return res.json({ status: 0, msg: "No hay reserva previa" });
 
     reservas[reservas.length - 1].mesa = mesa;
     console.log("Reserva actualizada con mesa:", reservas[reservas.length - 1]);
-    res.json({ status: 1 });
+    const result = await addReservation(reservas)
+    if (result.success === true) {
+    res.json({ status: 1, id: result.id });
+  } else {
+    console.log(result)
+    console.error("Error base de datos:", result.error);
+    res.status(500).json({ status: 0, error: result.error });
+}
 });
 
 app.listen(port, () => {

@@ -91,7 +91,7 @@
 
    form.addEventListener("submit", async e => {
     e.preventDefault(); // evita que el formulario recargue la página
-
+    btn.disabled = true;
     snap(input); // ajusta la hora antes de enviar
 
     const formData = new FormData(form);
