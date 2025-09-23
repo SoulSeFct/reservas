@@ -73,8 +73,18 @@ form.addEventListener("submit", async e => {
     });
 
     const respuesta = await res.json();
+    const reserva = respuesta.final[0];
+
+    const texto = `
+    Fecha: ${reserva.fecha}
+    Hora: ${reserva.tiempo}
+    Nombre: ${reserva.nombre}
+    Correo: ${reserva.correo}
+    Mesa: ${reserva.mesa}
+    `;
+
     if (respuesta.status === 1) {
-        alert(`Reserva exitosa, datos de reserva: ${respuesta.final}`);
+        alert("Reserva confirmada:\n" + texto);
         window.location.href = "/";
     } else {
         alert("Error al seleccionar la mesa: " + respuesta.error);

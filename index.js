@@ -55,9 +55,9 @@ app.post("/api/reservas/mesa", async (req, res) => {
     if (reservas.length === 0) return res.json({ status: 0, msg: "No hay reserva previa" });
 
     reservas[reservas.length - 1].mesa = mesa;
-    console.log("Reserva actualizada con mesa:", reservas[reservas.length - 1]);
     const result = await addReservation(reservas)
     if (result.success === true) {
+    console.log(reservas)
     res.json({ status: 1, id: result.id , final: reservas});
   } else {
     console.log(result)
