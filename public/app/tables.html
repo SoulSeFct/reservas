@@ -41,6 +41,7 @@
     </form>
 </body>
 <script>
+let confirmacion = []
 let mesaelegida = "";
 const mesas = document.querySelectorAll('.mesa');
 
@@ -73,7 +74,7 @@ form.addEventListener("submit", async e => {
 
     const respuesta = await res.json();
     if (respuesta.status === 1) {
-        alert("Mesa seleccionada correctamente");
+        alert(`Reserva exitosa, datos de reserva: ${respuesta.final}`);
         window.location.href = "/";
     } else {
         alert("Error al seleccionar la mesa: " + respuesta.error);

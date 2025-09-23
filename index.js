@@ -58,7 +58,7 @@ app.post("/api/reservas/mesa", async (req, res) => {
     console.log("Reserva actualizada con mesa:", reservas[reservas.length - 1]);
     const result = await addReservation(reservas)
     if (result.success === true) {
-    res.json({ status: 1, id: result.id });
+    res.json({ status: 1, id: result.id , final: reservas});
   } else {
     console.log(result)
     console.error("Error base de datos:", result.error);
