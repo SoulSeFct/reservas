@@ -91,7 +91,7 @@
 
    form.addEventListener("submit", async e => {
     e.preventDefault(); // evita que el formulario recargue la página
-    btn.disabled = true;
+    btn.disabled = true; // deshabilita el botón mientras se procesa
     snap(input); // ajusta la hora antes de enviar
 
     const formData = new FormData(form);
@@ -108,11 +108,23 @@
         if(respuesta.status === 1){
             form.reset();
             window.location.href="/tables"
+        } else if(respuesta.status === 2){
+            alert("Ya tienes una reserva para esta fecha y hora");
+            btn.disabled = false;
+        } else if(respuesta.status === 3){
+            const mesasOcupadas = respuesta.conflictos.map(c => c.mesa).join(", ");
+            alert(`Hay otras reservas en ese horario. Mesas ocupadas: ${mesasOcupadas}`);
+            btn.disabled = false;
         }
         
     } catch (err) {
         console.error(err);
         alert("Error al enviar la reserva");
+        btn.disabled = false; // re-habilita el botón en caso de error
+    } finally {
+        if (!window.location.href.endsWith('/tables')) {
+            btn.disabled = false; // asegura que el botón se re-habilite si no hubo redirección
+        }
     }
 });
 </script>

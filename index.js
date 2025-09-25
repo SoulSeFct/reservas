@@ -43,10 +43,40 @@ app.get('/booking', async (req, res) => {
 
 let reservas = [];
 
-app.post("/api/reservas", (req, res) => {
+app.post("/api/reservas", async (req, res) => {
     reservas = [];
     reservas.push(req.body);
-    console.log("Datos recibidos:", req.body);
+    let todasLasReservas = await getReservations();
+    console.log(todasLasReservas)
+    
+    // Verificar si ya existe una reserva con los mismos datos
+    let existeDuplicado = false;
+
+    for (const reservaExistente of todasLasReservas) {
+        const datosReserva = reservaExistente['0'];
+        if (!datosReserva) continue;
+        console.log("Comparando fechas:", {
+            fechaExistente: datosReserva.fecha,
+            fechaNueva: req.body.fecha,
+            tiempoExistente: datosReserva.tiempo,
+            tiempoNuevo: req.body.tiempo,
+            correoExistente: datosReserva.correo,
+            correoNuevo: req.body.correo
+        });
+
+        if (String(datosReserva.fecha) === String(req.body.fecha) && 
+            String(datosReserva.tiempo) === String(req.body.tiempo) &&
+            String(datosReserva.correo) === String(req.body.correo)) {
+            existeDuplicado = true;
+            console.log("⚠️ Ya existe una reserva con ese correo en esa fecha y hora.");
+            break;
+        }
+    }
+
+    if (existeDuplicado) {
+        return res.json({ status: 2, message: "Ya tienes una reserva para esta fecha y hora" });
+    }
+
     res.json({ status: 1 });
 });
 
