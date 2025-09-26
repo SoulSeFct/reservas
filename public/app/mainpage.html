@@ -86,15 +86,21 @@ async function cargarReservas() {
         tbody.innerHTML = ""; // limpiar tabla
 
         data.forEach(r => {
-            const fila = document.createElement("tr");
-            fila.innerHTML = `
-                <td>${r.correo}</td>
-                <td>${r.fecha}</td>
-                <td>${r.tiempo}</td>
-                <td>${r.mesa}</td>
-            `;
-            tbody.appendChild(fila);
-        });
+    const fechaHoraReserva = new Date(`${r.fecha}T${r.tiempo}`);
+
+    const ahora = new Date();
+    if (fechaHoraReserva >= ahora) {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${r.correo}</td>
+            <td>${r.fecha}</td>
+            <td>${r.tiempo}</td>
+            <td>${r.mesa}</td>
+        `;
+        tbody.appendChild(fila);
+    }
+});
+
     } catch (err) {
         console.error("Error cargando reservas:", err);
     }
