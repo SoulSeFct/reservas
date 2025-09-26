@@ -1,7 +1,6 @@
 import express from "express";
 import { promises as fs } from "fs";
-import path from "path";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 import { addReservation, getReservations } from "./firebase/firebase.js";
 
@@ -9,93 +8,128 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-
 app.use(express.static('public'));
 
+// --- Páginas ---
 app.get('/', async (req, res) => {
-  try {
-    const content = await fs.readFile(( './public/app/mainpage.html'), 'utf-8');
-    res.send(content);
-  } catch (err) {
-    res.status(500).send('Error en Mainpage.');
-  }
+    try {
+        const content = await fs.readFile('./public/app/mainpage.html', 'utf-8');
+        res.send(content);
+    } catch (err) {
+        res.status(500).send('Error en Mainpage.');
+    }
 });
-
-
 
 app.get('/tables', async (req, res) => {
     try {
-      const content = await fs.readFile(('./public/app/tables.html'), 'utf-8');
-      res.send(content);
+        const content = await fs.readFile('./public/app/tables.html', 'utf-8');
+        res.send(content);
     } catch (err) {
-      res.status(500).send('Error en Introduccion.');
+        res.status(500).send('Error en Tables.');
     }
 });
 
 app.get('/booking', async (req, res) => {
     try {
-      const content = await fs.readFile(('./public/app/booking.html'), 'utf-8');
-      res.send(content);
+        const content = await fs.readFile('./public/app/booking.html', 'utf-8');
+        res.send(content);
     } catch (err) {
-      res.status(500).send('Error en Introduccion.');
+        res.status(500).send('Error en Booking.');
     }
 });
 
+// --- Reservas temporales ---
 let reservas = [];
 
+// Crear una reserva (solo fecha, tiempo, correo)
 app.post("/api/reservas", async (req, res) => {
-    reservas = [];
-    reservas.push(req.body);
+    const { fecha, tiempo, correo } = req.body;
+
+    // Traer todas las reservas existentes
     let todasLasReservas = await getReservations();
-    console.log(todasLasReservas)
-    
-    // Verificar si ya existe una reserva con los mismos datos
-    let existeDuplicado = false;
 
-    for (const reservaExistente of todasLasReservas) {
-        const datosReserva = reservaExistente['0'];
-        if (!datosReserva) continue;
-        console.log("Comparando fechas:", {
-            fechaExistente: datosReserva.fecha,
-            fechaNueva: req.body.fecha,
-            tiempoExistente: datosReserva.tiempo,
-            tiempoNuevo: req.body.tiempo,
-            correoExistente: datosReserva.correo,
-            correoNuevo: req.body.correo
-        });
-
-        if (String(datosReserva.fecha) === String(req.body.fecha) && 
-            String(datosReserva.tiempo) === String(req.body.tiempo) &&
-            String(datosReserva.correo) === String(req.body.correo)) {
-            existeDuplicado = true;
-            console.log("⚠️ Ya existe una reserva con ese correo en esa fecha y hora.");
-            break;
-        }
-    }
+    // Verificar duplicados
+    const existeDuplicado = todasLasReservas.some(r => {
+        const datos = r['0'] || r;
+        return datos && datos.fecha === fecha && datos.tiempo === tiempo && datos.correo === correo;
+    });
 
     if (existeDuplicado) {
         return res.json({ status: 2, message: "Ya tienes una reserva para esta fecha y hora" });
     }
 
-    res.json({ status: 1 });
+    // Guardar temporalmente
+    reservas.push({ fecha, tiempo, correo });
+
+    res.json({ status: 1, fecha, tiempo });
 });
 
+// Obtener mesas ocupadas para una fecha y hora
+app.get("/getmesasdone", async (req, res) => {
+    try {
+        const { fecha, tiempo } = req.query;
+        if (!fecha || !tiempo) return res.json([]);
+
+        const all = await getReservations();
+        const mesasOcupadas = [];
+
+        for (const r of all) {
+            const datosReserva = r['0'] || r;
+            if (!datosReserva) continue;
+
+            if (String(datosReserva.fecha) === String(fecha) &&
+                String(datosReserva.tiempo) === String(tiempo)) {
+                if (datosReserva.mesa) mesasOcupadas.push(datosReserva.mesa);
+            }
+        }
+
+        res.json(mesasOcupadas);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error obteniendo mesas");
+    }
+});
+
+// Seleccionar mesa para la última reserva creada
 app.post("/api/reservas/mesa", async (req, res) => {
     const { mesa } = req.body;
     if (reservas.length === 0) return res.json({ status: 0, msg: "No hay reserva previa" });
 
+    // Asignar mesa a la última reserva
     reservas[reservas.length - 1].mesa = mesa;
-    const result = await addReservation(reservas)
+
+    const result = await addReservation(reservas);
     if (result.success === true) {
-    console.log(reservas)
-    res.json({ status: 1, id: result.id , final: reservas});
-  } else {
-    console.log(result)
-    console.error("Error base de datos:", result.error);
-    res.status(500).json({ status: 0, error: result.error });
-}
+        const ultimaReserva = reservas[reservas.length - 1];
+        // Limpiar temporal
+        reservas = [];
+        res.json({ status: 1, final: [ultimaReserva] });
+    } else {
+        console.error("Error base de datos:", result.error);
+        res.status(500).json({ status: 0, error: result.error });
+    }
+});
+
+// Endpoint para obtener todas las reservas
+app.get("/api/reservas/all", async (req, res) => {
+    try {
+        const all = await getReservations();
+        const reservasSimplificadas = all.map(r => {
+            const datos = r['0'] || r;
+            return {
+                correo: datos.correo,
+                fecha: datos.fecha,
+                tiempo: datos.tiempo,
+                mesa: datos.mesa || "-"
+            };
+        });
+        res.json(reservasSimplificadas);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error obteniendo reservas");
+    }
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}`);
 });

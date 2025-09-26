@@ -157,3 +157,39 @@ nav a:hover {
   background: #f4f4f4;
   
 }
+
+table{
+  justify-self: center;
+  margin-bottom: 5vh;
+  width: 80%;
+}
+.tabla-reservas {
+    width: 80%;
+    margin: 50px auto; /* centra el contenedor horizontalmente */
+}
+
+.tabla-reservas h2 {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    text-align: center; /* solo el título centrado */
+}
+
+.tabla-reservas table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.tabla-reservas th, .tabla-reservas td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: right; /* ahora sí, las celdas a la derecha */
+}
+
+.tabla-reservas th {
+    background-color: #f2f2f2;
+}
+
+h2{
+  justify-self: center;
+}

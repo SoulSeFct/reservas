@@ -105,13 +105,18 @@
         });
 
         const respuesta = await res.json();
-        if(respuesta.status === 1){
+
+        if (respuesta.status === 1) {
+            // Guardar fecha y tiempo en localStorage
+            localStorage.setItem("fechaReserva", respuesta.fecha);
+            localStorage.setItem("tiempoReserva", respuesta.tiempo);
+
             form.reset();
-            window.location.href="/tables"
-        } else if(respuesta.status === 2){
+            window.location.href = "/tables"; // redirige a tables.html
+        } else if (respuesta.status === 2) {
             alert("Ya tienes una reserva para esta fecha y hora");
             btn.disabled = false;
-        } else if(respuesta.status === 3){
+        } else if (respuesta.status === 3) {
             const mesasOcupadas = respuesta.conflictos.map(c => c.mesa).join(", ");
             alert(`Hay otras reservas en ese horario. Mesas ocupadas: ${mesasOcupadas}`);
             btn.disabled = false;
@@ -127,5 +132,6 @@
         }
     }
 });
+
 </script>
 </html>

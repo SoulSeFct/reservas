@@ -53,13 +53,54 @@
       </div>
     </div>
   </section>
-
+<h2>Reservaciones recientes</h2>
+<table id="tablaReservas">
+        <thead>
+            <tr>
+                <th>Correo</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Mesa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se llenará dinámicamente -->
+        </tbody>
+    </table>
   <!-- Reservas -->
   <section id="reservas" class="reservas">
     <h3>Reserva tu Mesa</h3>
     <p>Disfruta de una experiencia única con kiwis reservando en segundos.</p>
     <a href="booking" class="btn">Reservar Ahora</a>
+    <div class="tabla-reservas">
+  </div>
   </section>
 
 </body>
+<script>
+async function cargarReservas() {
+    try {
+        const res = await fetch("/api/reservas/all");
+        const data = await res.json();
+        const tbody = document.querySelector("#tablaReservas tbody");
+        tbody.innerHTML = ""; // limpiar tabla
+
+        data.forEach(r => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+                <td>${r.correo}</td>
+                <td>${r.fecha}</td>
+                <td>${r.tiempo}</td>
+                <td>${r.mesa}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    } catch (err) {
+        console.error("Error cargando reservas:", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", cargarReservas);
+</script>
+
 </html>

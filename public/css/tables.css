@@ -137,3 +137,7 @@ svg .mesa:hover{
   fill: #c0392b !important;
   transform: scale(1.01);
 }
+.ocupada{
+    fill: #242323 !important;
+  transform: scale(1.01);
+}

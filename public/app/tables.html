@@ -41,10 +41,10 @@
     </form>
 </body>
 <script>
-let confirmacion = []
 let mesaelegida = "";
 const mesas = document.querySelectorAll('.mesa');
 
+// Selección de mesa
 mesas.forEach(mesa => {
     mesa.addEventListener('click', () => {
         mesas.forEach(m => m.classList.remove('active'));
@@ -54,47 +54,88 @@ mesas.forEach(mesa => {
 });
 
 const form = document.getElementById("form1");
-const boton = document.getElementById("btnContinuar")
+const boton = document.getElementById("btnContinuar");
 
+// Función para obtener mesas ocupadas
+async function mesasGood(fecha, tiempo) {
+    try {
+        const res = await fetch(`/getmesasdone?fecha=${encodeURIComponent(fecha)}&tiempo=${encodeURIComponent(tiempo)}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await res.json();
+        console.log("Mesas ocupadas:", data);
+
+        data.forEach(mesaId => {
+        const mesa = document.getElementById(mesaId);
+        if (mesa) {
+            mesa.classList.remove("mesa")
+            mesa.classList.add("ocupada"); // agregar ocupada
+            mesa.removeEventListener('click', () => {}); // opcional: bloquear selección
+        }
+        });
+
+    } catch (err) {
+        console.error("Error en mesasGood:", err);
+    }
+}
+
+// Enviar selección de mesa
 form.addEventListener("submit", async e => {
     e.preventDefault();
     boton.disabled = true;
+
     if (mesaelegida === "") {
         alert("Elige una mesa");
+        boton.disabled = false;
         return;
     }
 
-    // Enviar solo la mesa, el resto de datos ya está en el servidor
     try {
-    const res = await fetch("/api/reservas/mesa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mesa: mesaelegida })
-    });
+        const res = await fetch("/api/reservas/mesa", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mesa: mesaelegida })
+        });
 
-    const respuesta = await res.json();
-    const reserva = respuesta.final[0];
-
-    const texto = `
-    Fecha: ${reserva.fecha}
-    Hora: ${reserva.tiempo}
-    Nombre: ${reserva.nombre}
-    Correo: ${reserva.correo}
-    Mesa: ${reserva.mesa}
-    `;
-
-    if (respuesta.status === 1) {
-        alert("Reserva confirmada:\n" + texto);
-        window.location.href = "/";
-    } else {
-        alert("Error al seleccionar la mesa: " + respuesta.error);
-    }
+        const respuesta = await res.json();
+        if (respuesta.status === 1) {
+            const reserva = respuesta.final[0];
+            const texto = `
+                Fecha: ${reserva.fecha}
+                Hora: ${reserva.tiempo}
+                Nombre: ${reserva.nombre}
+                Correo: ${reserva.correo}
+                Mesa: ${reserva.mesa}
+            `;
+            alert("Reserva confirmada:\n" + texto);
+            window.location.href = "/";
+        } else {
+            alert("Error al seleccionar la mesa: " + respuesta.error);
+            boton.disabled = false;
+        }
 
     } catch (err) {
         console.error(err);
         alert("Error al seleccionar la mesa");
+        boton.disabled = false;
+    }
+});
+
+// Al cargar la página, obtener fecha y tiempo desde localStorage
+document.addEventListener("DOMContentLoaded", () => {
+    const fecha = localStorage.getItem("fechaReserva");
+    const tiempo = localStorage.getItem("tiempoReserva");
+
+    console.log("Fecha de la reserva:", fecha);
+    console.log("Hora de la reserva:", tiempo);
+
+    if (fecha && tiempo) {
+        mesasGood(fecha, tiempo);
     }
 });
 </script>
+
 
 </html>
