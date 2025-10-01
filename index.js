@@ -43,7 +43,7 @@ let reservas = [];
 
 // Crear una reserva (solo fecha, tiempo, correo)
 app.post("/api/reservas", async (req, res) => {
-    const { fecha, tiempo, correo } = req.body;
+    const { fecha, tiempo, correo, nombre } = req.body;
 
     // Traer todas las reservas existentes
     let todasLasReservas = await getReservations();
@@ -59,7 +59,7 @@ app.post("/api/reservas", async (req, res) => {
     }
 
     // Guardar temporalmente
-    reservas.push({ fecha, tiempo, correo });
+    reservas.push({ fecha, tiempo, correo, nombre });
 
     res.json({ status: 1, fecha, tiempo });
 });
